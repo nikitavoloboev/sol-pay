@@ -12,6 +12,7 @@ import (
 )
 
 func SessionMiddleware() echo.MiddlewareFunc {
+
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			cookie, err := c.Cookie("hanko")
