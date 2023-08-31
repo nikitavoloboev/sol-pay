@@ -10,7 +10,7 @@ import (
 
 func RegisterRoutes(e *echo.Echo) {
 	e.GET("/", root)
-	e.GET("/hello", hello, middleware.LoggerMiddleware) // Add middleware here
+	e.GET("/hello", hello, middleware.LoggerMiddleware, middleware.SessionMiddleware()) // Add middleware here
 }
 
 func root(c echo.Context) error {
