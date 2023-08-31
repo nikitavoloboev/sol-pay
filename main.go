@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/sol-pay/routes"
+	"github.com/nikitavoloboev/sol-pay/routes"
 
 	"github.com/labstack/echo/v4"
 )

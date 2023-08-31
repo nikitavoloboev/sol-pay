@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 
-	"github.com/sol-pay/middleware"
+	"github.com/nikitavoloboev/sol-pay/middleware"
 
 	"github.com/labstack/echo/v4"
 )
