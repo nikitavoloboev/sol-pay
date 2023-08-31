@@ -42,12 +42,10 @@ func hello(c echo.Context) error {
 }
 
 func generateWallet() (string, string) {
-	//return "walletAddress"
-
 	// Create a new account:
 	account := solana.NewWallet()
-	//fmt.Println("account private key:", account.PrivateKey)
-	//fmt.Println("account public key:", account.PublicKey())
+	fmt.Println("account private key:", account.PrivateKey)
+	fmt.Println("account public key:", account.PublicKey())
 
 	// Create a new RPC client:
 	client := rpc.New(rpc.DevNet_RPC)
@@ -118,14 +116,14 @@ func (h *Handler) sendPayment(c echo.Context) error {
 
 	}
 
-	/*FIXME - create it from db details */
 	// Load the account that you will send funds FROM:
-	accountFrom, err := solana.PrivateKeyFromSolanaKeygenFile("/path/to/.config/solana/id.json")
+	// accountFrom, err := solana.PrivateKeyFromSolanaKeygenFile("/path/to/.config/solana/id.json")
+	accountFrom, err := solana.PrivateKeyFromBase58(sourceUser.PrivateKey)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("accountFrom private key:", accountFrom)
-	fmt.Println("accountFrom public key:", accountFrom.PublicKey())
+	fmt.Println("private key:", accountFrom.String())
+	fmt.Println("public key:", accountFrom.PublicKey().String())
 
 	// The public key of the account that you will send sol TO:
 	accountTo := solana.MustPublicKeyFromBase58(targetUser.Wallet)
@@ -177,6 +175,7 @@ func (h *Handler) sendPayment(c echo.Context) error {
 	}
 	spew.Dump(sig)
 
+	return nil
 }
 
 /*
