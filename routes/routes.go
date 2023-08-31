@@ -3,6 +3,7 @@ package routes
 import (
 	"net/http"
 
+	"github.com/gagliardetto/solana-go"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"github.com/nikitavoloboev/sol-pay/middleware"
@@ -30,13 +31,35 @@ func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello from Echo with Middleware!")
 }
 
-func generateWallet() string {
-	return "walletAddress"
+func generateWallet() (string, string) {
+	//return "walletAddress"
+
+	// Create a new account:
+	account := solana.NewWallet()
+	//fmt.Println("account private key:", account.PrivateKey)
+	//fmt.Println("account public key:", account.PublicKey())
+
+	return account.PrivateKey.String(), account.PublicKey().String()
+
+	//// Create a new RPC client:
+	//client := rpc.New(rpc.TestNet_RPC)
+	//
+	//// Airdrop 5 SOL to the new account:
+	//out, err := client.RequestAirdrop(
+	//  context.TODO(),
+	//  account.PublicKey(),
+	//  solana.LAMPORTS_PER_SOL*1,
+	//  rpc.CommitmentFinalized,
+	//)
+	//if err != nil {
+	//  panic(err)
+	//}
+	//fmt.Println("airdrop transaction signature:", out)
 }
 
 func (h *Handler) addUser(c echo.Context) error {
 	user := model.User{}
-	user.Wallet = generateWallet()
+	user.PrivateKey, user.Wallet = generateWallet()
 	if err := c.Bind(&user); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
