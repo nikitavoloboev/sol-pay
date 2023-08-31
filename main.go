@@ -16,6 +16,9 @@ func main() {
 	}
 	defer db.Close()
 
+	// Migrate the database to ensure the user table exists
+	model.MigrateDB(db)
+
 	e := echo.New()
 
 	routes.RegisterRoutes(e, db)

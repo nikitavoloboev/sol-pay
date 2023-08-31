@@ -18,7 +18,7 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
 
 	e.GET("/", root)
 	e.GET("/hello", hello, middleware.LoggerMiddleware, middleware.SessionMiddleware()) // Add middleware here
-	e.POST("/users", h.addUser)
+	e.POST("/users", h.addUser, middleware.LoggerMiddleware)
 	// e.PUT("/users/:id", updateUser)
 }
 
@@ -30,8 +30,13 @@ func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello from Echo with Middleware!")
 }
 
+func generateWallet() string {
+	return "walletAddress"
+}
+
 func (h *Handler) addUser(c echo.Context) error {
 	user := model.User{}
+	user.Wallet = generateWallet()
 	if err := c.Bind(&user); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
