@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gagliardetto/solana-go"
@@ -31,6 +32,11 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
 	e.POST("/users", h.addUser, middleware.LoggerMiddleware)
 	e.POST("/pay", h.sendPayment, middleware.LoggerMiddleware)
 	// e.PUT("/users/:id", updateUser)
+	/*Goods*/
+	e.POST("/goods", h.createGood)
+	e.GET("/goods", h.getGoods)
+	e.PUT("/goods/:id", h.updateGood)
+	e.DELETE("/goods/:id", h.deleteGood)
 }
 
 func root(c echo.Context) error {
@@ -175,6 +181,9 @@ func (h *Handler) sendPayment(c echo.Context) error {
 	}
 	spew.Dump(sig)
 
+	// FIXME TODO
+	// update BoughtProducts for those who buy
+
 	return nil
 }
 
@@ -197,3 +206,56 @@ func updateUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, user)
 }
 */
+
+func (h *Handler) createGood(c echo.Context) error {
+	good := &model.Product{}
+	if err := c.Bind(good); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	if err := model.CreateGood(h.DB, good); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusCreated, good)
+}
+
+func (h *Handler) getGoods(c echo.Context) error {
+	// Get user ID from the query parameter
+	userIDParam := c.QueryParam("user_id")
+	userID, err := strconv.Atoi(userIDParam)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid user ID")
+	}
+
+	goods, err := model.GetGoodsByUserID(h.DB, uint(userID))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, goods)
+}
+
+func (h *Handler) updateGood(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	good := &model.Product{}
+	if err := c.Bind(good); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	good.ID = uint(id)
+	if err := h.DB.Save(&good).Error; err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, good)
+}
+
+func (h *Handler) deleteGood(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	if err := h.DB.Delete(&model.Product{}, id).Error; err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.NoContent(http.StatusNoContent)
+}
