@@ -2,6 +2,7 @@ package routes
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -30,6 +31,7 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
 	e.GET("/", root)
 	e.GET("/hello", hello, middleware.LoggerMiddleware, middleware.SessionMiddleware()) // Add middleware here
 	e.POST("/users", h.addUser, middleware.LoggerMiddleware)
+	e.GET("/users/:id", h.showUser, middleware.LoggerMiddleware)
 	e.POST("/pay", h.sendPayment, middleware.LoggerMiddleware)
 	// e.PUT("/users/:id", updateUser)
 	/*Goods*/
@@ -83,6 +85,24 @@ func (h *Handler) addUser(c echo.Context) error {
 	return c.JSON(http.StatusCreated, user)
 }
 
+func (h *Handler) showUser(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	user, err := GetUserByID(h.DB, uint(id))
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve user details")
+	}
+	userResponse, _ := json.Marshal(user)
+	userMap := make(map[string]interface{})
+	json.Unmarshal(userResponse, &userMap)
+	delete(userMap, "private_key")
+
+	return c.JSON(http.StatusOK, userMap)
+}
+
 func GetUserByID(db *gorm.DB, userID uint) (*model.User, error) {
 	var user model.User
 	if err := db.First(&user, userID).Error; err != nil {
@@ -92,8 +112,9 @@ func GetUserByID(db *gorm.DB, userID uint) (*model.User, error) {
 }
 
 type UserIDInput struct {
-	SourceUserID uint `json:"source_user_id"`
-	TargetUserID uint `json:"target_user_id"`
+	SourceUserID   uint    `json:"source_user_id"`
+	TargetUserID   uint    `json:"target_user_id"`
+	ExternalWallet *string `json:"external_wallet,omitempty"`
 }
 
 func (h *Handler) sendPayment(c echo.Context) error {

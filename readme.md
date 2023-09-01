@@ -20,6 +20,11 @@ with some default SOL balance:
 curl -X POST http://127.0.0.1:8080/users -H "Content-Type: application/json" -d '{"id": 2,"name":"John Updated", "email":"test@test.com"}'
 ```
 
+## How to get user's details
+```bash
+curl -X GET http://localhost:8080/users/8
+```
+
 ## How to send transaction
 ```bash
 curl -X POST http://localhost:8080/pay \

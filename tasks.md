@@ -32,6 +32,7 @@
 
 ## Go backend
 
+- [x] endpoint to retrieve user's details without private key
 - allow to receive money from externally
 - endpoint for show `solana wallet address`
 - endpoint to allow to send `solana` to external solana address (cash out)
