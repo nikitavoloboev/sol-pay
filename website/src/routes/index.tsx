@@ -7,7 +7,10 @@ export default function Home() {
       <Nav />
       <div class="px-[10%] w-full h-full">
         <div class="border-2 w-full h-full rounded-[4px] border-black flex flex-col">
-          <div class="px-[50px] border-b-2  border-black p-[50px] h-[500px] text-[46px] font-bold flex flex-col justify-center items-center w-full">
+          <div
+            style={{ "background-image": "../public/solana-phone.jpg" }}
+            class="px-[50px] border-b-2  border-black p-[50px] h-[500px] text-[46px] font-bold flex flex-col justify-center items-center w-full"
+          >
             <div>
               <div>Buy Phone Please!</div>
               <div class="text-[#696969] font-light text-[32px]">
