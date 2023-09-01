@@ -47,6 +47,10 @@ type ProductName struct {
 	Name string `json:"product_name"`
 }
 
+func (ProductName) TableName() string {
+	return "products"
+}
+
 func GetProductsCountByUserID(db *gorm.DB, userID uint) ([]ProductName, error) {
 	var products []Product
 	if err := db.Where("created_by = ?", userID).Find(&products).Error; err != nil {
@@ -86,13 +90,44 @@ func GetProductsSoldCountUserID(db *gorm.DB, userID uint) ([]ProductSoldCount, e
 			return nil, err
 		}
 
-		responses = append(responses, ProductSoldCount{
-			ProductName: ProductName{
-				ID:   product.ID,
-				Name: product.Name},
-			Count: count,
-		})
+		if count > 0 {
+			responses = append(responses, ProductSoldCount{
+				ProductName: ProductName{
+					ID:   product.ID,
+					Name: product.Name},
+				Count: count,
+			})
+		}
 	}
 
 	return responses, nil
+}
+
+type UserGood struct {
+	ProductID uint
+	UserID    uint
+}
+
+func GetProductsBoughtByUserID(db *gorm.DB, userID uint) ([]ProductName, error) {
+	var responses []ProductName
+	var userGoods []UserGood
+
+	// Fetch all product IDs associated with the user
+	if err := db.Where("user_id = ?", userID).Find(&userGoods).Error; err != nil {
+		return nil, err
+	}
+
+	// Extract all product IDs
+	productIDs := make([]uint, len(userGoods))
+	for i, ug := range userGoods {
+		productIDs[i] = ug.ProductID
+	}
+
+	// Fetch product names using the extracted product IDs
+	if err := db.Where("created_by <> ?", userID).Where("id IN (?)", productIDs).Find(&responses).Error; err != nil {
+		return nil, err
+	}
+
+	return responses, nil
+
 }

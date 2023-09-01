@@ -114,6 +114,12 @@ func (h *Handler) showUser(c echo.Context) error {
 	}
 	userMap["sold_products"] = productsSold
 
+	var productsBought []model.ProductName
+	productsBought, err = model.GetProductsBoughtByUserID(h.DB, uint(id))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Unable to fetch details"})
+	}
+	userMap["bought_products"] = productsBought
 	return c.JSON(http.StatusOK, userMap)
 }
 
