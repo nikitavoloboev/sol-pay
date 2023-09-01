@@ -37,6 +37,7 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
 	/*Goods*/
 	e.POST("/goods", h.createGood)
 	e.GET("/goods", h.getGoods)
+	e.GET("/goods/:id", h.getGoodDetails)
 	e.PUT("/goods/:id", h.updateGood)
 	e.DELETE("/goods/:id", h.deleteGood)
 }
@@ -288,6 +289,24 @@ func (h *Handler) updateGood(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, good)
+}
+
+func (h *Handler) getGoodDetails(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	productDetails, err := model.GetProductsBoughtCountByProductID(h.DB, uint(id))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	// FIXME NOTE: bind error for marchalling from ORM to JSON
+	// if err := c.Bind(productDetails); err != nil {
+	// 	return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	// }
+
+	return c.JSON(http.StatusOK, productDetails)
 }
 
 func (h *Handler) deleteGood(c echo.Context) error {

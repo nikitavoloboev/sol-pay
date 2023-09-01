@@ -1,6 +1,8 @@
 package model
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -73,6 +75,12 @@ type ProductSoldCount struct {
 	Count int `json:"count"`
 }
 
+type ProductCount struct {
+	ProductId uint   `json:"product_id"`
+	Name      string `json:"product_name"`
+	Count     int    `json:"count"`
+}
+
 func GetProductsSoldCountUserID(db *gorm.DB, userID uint) ([]ProductSoldCount, error) {
 	var products []Product
 	var responses []ProductSoldCount
@@ -130,4 +138,29 @@ func GetProductsBoughtByUserID(db *gorm.DB, userID uint) ([]ProductName, error) 
 
 	return responses, nil
 
+}
+
+func GetProductsBoughtCountByProductID(db *gorm.DB, productID uint) (ProductSoldCount, error) {
+	var countResult ProductSoldCount
+	countResult.ID = productID
+
+	var productCnt ProductCount
+	if err := db.Table("user_goods").Select("product_id, count(*) as count").Where("product_id = ?", productID).Group("product_id").First(&productCnt).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// If no record is found, set count to 0
+			countResult.Count = 0
+		}
+	}
+	countResult.Count = productCnt.Count
+
+	var products []Product
+	// Fetch product names using the extracted product IDs
+	if err := db.Where("id = ?", productID).Find(&products).Error; err != nil {
+		return countResult, err
+	}
+	if len(products) == 1 {
+		countResult.Name = products[0].Name
+	}
+
+	return countResult, nil
 }

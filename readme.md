@@ -38,7 +38,12 @@ curl -X POST http://localhost:8080/pay \
 curl -X POST http://localhost:8080/goods \
 -H "Content-Type: application/json" \
 -d '{"name": "Laptop", "price": 1500, "user_id": 8}'
+```
 
+## How to get product's details
+```bash
+ curl -X GET http://localhost:8080/goods/2
+ {"id":2,"product_name":"Chair","count":1}
 ```
 
 ## How to list/update/delete goods
