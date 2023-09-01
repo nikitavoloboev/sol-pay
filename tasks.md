@@ -33,8 +33,9 @@
 ## Go backend
 
 - [x] endpoint to retrieve user's details without private key
+  - [x] show which products was created by user => available for sale
 - allow to receive money from externally
-- endpoint for show `solana wallet address`
+- [x] endpoint for show `solana wallet address`
 - endpoint to allow to send `solana` to external solana address (cash out)
 - support multiple currencies
   - dollar, euro, japan yen

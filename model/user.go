@@ -41,3 +41,25 @@ func GetGoodsByUserID(db *gorm.DB, userID uint) ([]Product, error) {
 	}
 	return goods, nil
 }
+
+type ProductCount struct {
+	ID          uint   `json:"id"`
+	ProductName string `json:"product_name"`
+}
+
+func GetProductsCountByUserID(db *gorm.DB, userID uint) ([]ProductCount, error) {
+	var products []Product
+	if err := db.Where("created_by = ?", userID).Find(&products).Error; err != nil {
+		return nil, err
+	}
+
+	var responses []ProductCount
+	for _, p := range products {
+		responses = append(responses, ProductCount{
+			ID:          p.ID,
+			ProductName: p.Name,
+		})
+	}
+
+	return responses, nil
+}

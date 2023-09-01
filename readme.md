@@ -23,6 +23,7 @@ curl -X POST http://127.0.0.1:8080/users -H "Content-Type: application/json" -d 
 ## How to get user's details
 ```bash
 curl -X GET http://localhost:8080/users/8
+{"bought_products":null,"created_products":[{"id":3,"product_name":"Chair"},{"id":4,"product_name":"Laptop"}],"email":"test@test.com","id":8,"name":"John Updated","wallet":"GrrG9YS4C9EwtWanHQYMejF5UqBXSjQ42qAWjNRy5CyX"}
 ```
 
 ## How to send transaction
