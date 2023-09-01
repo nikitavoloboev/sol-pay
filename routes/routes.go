@@ -100,12 +100,19 @@ func (h *Handler) showUser(c echo.Context) error {
 	json.Unmarshal(userResponse, &userMap)
 	delete(userMap, "private_key")
 
-	var products []model.ProductCount
+	var products []model.ProductName
 	products, err = model.GetProductsCountByUserID(h.DB, uint(id))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Unable to fetch details"})
 	}
 	userMap["created_products"] = products
+
+	var productsSold []model.ProductSoldCount
+	productsSold, err = model.GetProductsSoldCountUserID(h.DB, uint(id))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Unable to fetch details"})
+	}
+	userMap["sold_products"] = productsSold
 
 	return c.JSON(http.StatusOK, userMap)
 }
