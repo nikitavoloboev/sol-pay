@@ -57,6 +57,14 @@ curl -X POST http://localhost:8080/goods \
  {"id":2,"product_name":"Chair","count":1}
 ```
 
+## How to check whethere user have balance sufficient balance to buy product
+```bash
+curl -X POST http://localhost:8080/can-i-buy \
+-H "Content-Type: application/json" \
+-d '{"user_id": 7, "product_id": 5}'
+{"result":true}
+```
+
 ## How to list/update/delete goods
 
 ```bash

@@ -44,6 +44,7 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
 	/* Payment  */
 	e.POST("/pay", h.sendPayment, middleware.LoggerMiddleware)
 	e.POST("/balance", h.walletBalance, middleware.LoggerMiddleware)
+	e.POST("/can-i-buy", h.canIBuyProduct, middleware.LoggerMiddleware)
 }
 
 func root(c echo.Context) error {
@@ -146,6 +147,10 @@ type UserIDInput struct {
 type UserIDAPIInput struct {
 	UserID uint `json:"user_id"`
 }
+type UserIDProductIDAPIInput struct {
+	UserID    uint `json:"user_id"`
+	ProductID uint `json:"product_id"`
+}
 
 func getWalletBalance(wallet string) *big.Float {
 
@@ -184,6 +189,35 @@ func (h *Handler) walletBalance(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]string{"balance": solBalance.Text('f', 10)})
 
+}
+
+func currentSolanaPrice() float32 {
+	return 19.59
+}
+
+func (h *Handler) canIBuyProduct(c echo.Context) error {
+	var input UserIDProductIDAPIInput
+	if err := c.Bind(&input); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	sourceUser, err := GetUserByID(h.DB, input.UserID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	fmt.Print(sourceUser.Wallet)
+	solBalance := getWalletBalance(sourceUser.Wallet)
+
+	productId := input.ProductID
+	product, _ := model.GetGoodsByID(h.DB, productId)
+
+	balance, _ := solBalance.Float32()
+
+	balanceInUsd := balance * currentSolanaPrice()
+
+	canIBuyIt := balanceInUsd >= float32(product.Price)
+
+	return c.JSON(http.StatusOK, map[string]bool{"result": canIBuyIt})
 }
 
 func getRPCSolana() (*rpc.Client, error) {
