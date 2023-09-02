@@ -139,6 +139,7 @@ func GetUserByID(db *gorm.DB, userID uint) (*model.User, error) {
 type UserIDInput struct {
 	SourceUserID   uint    `json:"source_user_id"`
 	TargetUserID   uint    `json:"target_user_id"`
+	ProductID      uint    `json:"product_id"`
 	ExternalWallet *string `json:"external_wallet,omitempty"`
 }
 
@@ -146,21 +147,11 @@ type UserIDAPIInput struct {
 	UserID uint `json:"user_id"`
 }
 
-func (h *Handler) walletBalance(c echo.Context) error {
-	var input UserIDAPIInput
-	if err := c.Bind(&input); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
-
-	sourceUser, err := GetUserByID(h.DB, input.UserID)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
-	fmt.Print(sourceUser.Wallet)
+func getWalletBalance(wallet string) *big.Float {
 
 	client, _ := getRPCSolana()
 
-	pubKey := solana.MustPublicKeyFromBase58(sourceUser.Wallet) // FIXME prod address
+	pubKey := solana.MustPublicKeyFromBase58(wallet)
 	out, err := client.GetBalance(
 		context.TODO(),
 		pubKey,
@@ -175,6 +166,21 @@ func (h *Handler) walletBalance(c echo.Context) error {
 	var lamportsOnAccount = new(big.Float).SetUint64(uint64(out.Value))
 	// Convert lamports to sol:
 	var solBalance = new(big.Float).Quo(lamportsOnAccount, new(big.Float).SetUint64(solana.LAMPORTS_PER_SOL))
+	return solBalance
+}
+
+func (h *Handler) walletBalance(c echo.Context) error {
+	var input UserIDAPIInput
+	if err := c.Bind(&input); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	sourceUser, err := GetUserByID(h.DB, input.UserID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	fmt.Print(sourceUser.Wallet)
+	solBalance := getWalletBalance(sourceUser.Wallet)
 
 	return c.JSON(http.StatusOK, map[string]string{"balance": solBalance.Text('f', 10)})
 
@@ -190,7 +196,6 @@ func (h *Handler) sendPayment(c echo.Context) error {
 	if err := c.Bind(&input); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-
 	sourceUser, err := GetUserByID(h.DB, input.SourceUserID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -201,6 +206,19 @@ func (h *Handler) sendPayment(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
+	wtf := input.ProductID
+	product, err := model.GetGoodsByID(h.DB, wtf)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	sourceUserBalance := getWalletBalance(sourceUser.Wallet)
+
+	balance, _ := sourceUserBalance.Float32()
+	if float32(product.Price+0.005) < balance {
+		return echo.NewHTTPError(http.StatusInternalServerError, "not enough balance")
+
+	}
+
 	// Create a new RPC client:
 	rpcClient, _ := getRPCSolana()
 
@@ -208,7 +226,6 @@ func (h *Handler) sendPayment(c echo.Context) error {
 	wsClient, err := ws.Connect(context.Background(), rpc.DevNet_WS)
 	if err != nil {
 		panic(err)
-
 	}
 
 	// Load the account that you will send funds FROM:
@@ -216,8 +233,13 @@ func (h *Handler) sendPayment(c echo.Context) error {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("private key:", accountFrom.String())
-	fmt.Println("public key:", accountFrom.PublicKey().String())
+	//fmt.Println("private key:", accountFrom.String())
+	fmt.Println("SOURCE Wallet:", accountFrom.PublicKey().String())
+	fmt.Println("TARGET Wallet:", targetUser.Wallet)
+
+	/* do source user have enough balance to cover product cost and transaction fee */
+
+	/* Good to go - trying to do transaction */
 
 	// The public key of the account that you will send sol TO:
 	accountTo := solana.MustPublicKeyFromBase58(targetUser.Wallet)

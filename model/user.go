@@ -44,6 +44,14 @@ func GetGoodsByUserID(db *gorm.DB, userID uint) ([]Product, error) {
 	return goods, nil
 }
 
+func GetGoodsByID(db *gorm.DB, productID uint) (Product, error) {
+	var good Product
+	if err := db.Where("id = ?", productID).First(&good).Error; err != nil {
+		return Product{}, err
+	}
+	return good, nil
+}
+
 type ProductName struct {
 	ID   uint   `json:"id"`
 	Name string `json:"product_name"`
