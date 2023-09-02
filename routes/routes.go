@@ -218,7 +218,7 @@ func (h *Handler) checkBalance(productId uint, userId uint) bool {
 
 	balance, _ := solBalance.Float32()
 
-	balanceInUsd := balance / currentSolanaPriceInUSD()
+	balanceInUsd := balance * currentSolanaPriceInUSD()
 
 	return balanceInUsd >= float32(product.Price)
 
