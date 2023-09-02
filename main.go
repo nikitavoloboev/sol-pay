@@ -2,9 +2,7 @@ package main
 
 import (
 	"log"
-	"net/http"
 
-	"github.com/jub0bs/fcors"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/nikitavoloboev/sol-pay/model"
@@ -23,20 +21,9 @@ func main() {
 	model.MigrateDB(db)
 
 	e := echo.New()
-	cors, err := fcors.AllowAccess(
-		fcors.FromOrigins("http://localhost:8080"),
-		fcors.WithMethods(
-			http.MethodGet,
-			http.MethodPost,
-			http.MethodPut,
-			http.MethodDelete,
-		),
-		fcors.WithRequestHeaders("Authorization"),
-	)
 	if err != nil {
 		log.Fatal(err)
 	}
-	e.Use(echo.WrapMiddleware(cors))
 
 	// Add CORS middleware - Allow requests from any origin with the methods needed by your application
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{

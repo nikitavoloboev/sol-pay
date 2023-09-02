@@ -154,7 +154,7 @@ export default function store() {
                 <div
                   onClick={async () => {
                     if (checkedBalance()) {
-                      const url = "http://localhost:3000/pay"
+                      const url = "http://localhost:8080/pay"
                       const data = {
                         buyer_id: 8,
                         seller_id: 2,
@@ -181,9 +181,10 @@ export default function store() {
                       }
                     } else {
                       const url = "http://localhost:8080/can-i-buy"
+                      /* DK FIXME - TO BE CHANGED TO IDs of local DB! */
                       const data = {
-                        user_id: 12,
-                        product_id: 7,
+                        user_id: 20,
+                        product_id: 9,
                       }
 
                       const response = await fetch(url, {
