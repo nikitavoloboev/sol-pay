@@ -295,7 +295,7 @@ func (h *Handler) sendPayment(c echo.Context) error {
 		panic(err)
 	}
 	// amount := uint64(1) FIXME NOTE - can be usefull for debug
-	amount := uint64(float32(product.Price) * currentUSDPriceInSOL() * float32(math.Pow(10, 9)))
+	amount := uint64(float32(product.Price) / currentUSDPriceInSOL() * float32(math.Pow(10, 9)))
 	tx, err := solana.NewTransaction(
 		[]solana.Instruction{
 			system.NewTransferInstruction(

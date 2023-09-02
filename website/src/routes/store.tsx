@@ -1,8 +1,36 @@
-import { Show, createSignal } from "solid-js"
+import { Show, createSignal, onMount } from "solid-js"
 import Card from "~/components/Card"
+import { Core } from "@walletconnect/core"
+import { Web3Wallet } from "@walletconnect/web3wallet"
+import { json } from "solid-start"
 
 export default function store() {
   const [showInfoCard, setShowInfoCard] = createSignal(true)
+  const [notEnoughMoney, setNotEnoughMoney] = createSignal(false)
+  const [checkedBalance, setCheckedBalance] = createSignal(false)
+
+  // onMount(async () => {
+  //   const url = "http://localhost:3000/balance"
+  //   const data = {
+  //     buyer_id: 8,
+  //     product_id: 2,
+  //   }
+
+  //   const response = await fetch(url, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(data),
+  //   })
+
+  //   if (response.ok) {
+  //     const jsonResponse = await response.json()
+  //     console.log("Payment successful:", jsonResponse)
+  //   } else {
+  //     console.log("Payment failed:", response.status, response.statusText)
+  //   }
+  // })
   return (
     <>
       <style>
@@ -104,8 +132,89 @@ export default function store() {
                     </div>
                   </div>
                 </div>
-                <div class="w-full p-3 rounded-[6px] flex items-center justify-center font-light text-white text-[18px] bg-black">
-                  Add to Cart
+                {/* <div
+                  onClick={async () => {
+                    // const core = new Core({
+                    //   projectId: ,
+                    // })
+                    // const web3wallet = await Web3Wallet.init({
+                    //   core, // <- pass the shared `core` instance
+                    //   metadata: {
+                    //     name: "Demo app",
+                    //     description: "Demo Client as Wallet/Peer",
+                    //     url: "www.walletconnect.com",
+                    //     icons: [],
+                    //   },
+                    // })
+                  }}
+                >
+                  Connect wallet
+                </div> */}
+
+                <div
+                  onClick={async () => {
+                    if (checkedBalance()) {
+                      const url = "http://localhost:3000/pay"
+                      const data = {
+                        buyer_id: 8,
+                        seller_id: 2,
+                        product_id: 3,
+                      }
+
+                      const response = await fetch(url, {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                      })
+
+                      if (response.ok) {
+                        const jsonResponse = await response.json()
+                        console.log("Payment successful:", jsonResponse)
+                      } else {
+                        console.log(
+                          "Payment failed:",
+                          response.status,
+                          response.statusText
+                        )
+                      }
+                    } else {
+                      const url = "http://localhost:8080/can-i-buy"
+                      const data = {
+                        user_id: 12,
+                        product_id: 7,
+                      }
+
+                      const response = await fetch(url, {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                          "Access-Control-Allow-Origin": "*",
+                        },
+                        body: JSON.stringify(data),
+                      })
+                      console.log(response, "response")
+                      console.log(await response.text())
+
+                      const jsonResponse = await response.json()
+                      console.log(jsonResponse, "json response")
+
+                      if (jsonResponse.can_pay) {
+                        const jsonResponse = await response.json()
+                        console.log("Can pay:", jsonResponse)
+                      } else {
+                        console.log(
+                          "Cannot pay",
+                          response.status,
+                          response.statusText
+                        )
+                      }
+                    }
+                  }}
+                  class="w-full p-3 rounded-[6px] flex items-center justify-center font-light text-white text-[18px] bg-black"
+                >
+                  Pay
                 </div>
               </div>
             </div>

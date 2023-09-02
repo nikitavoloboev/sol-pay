@@ -37,11 +37,13 @@ curl -X POST http://localhost:8080/pay \
 ```
 
 it will return transaction id:
+
 ```bash
 {"tix":"3kvAHBE25xQ4eYE6BMsnHuYwwszds5Z1f9KcVnwCVWnUfzdm8EDTQetcpdjzhzrUWfd54aF5MFfiMEy65LtWoatt"}
 ```
 
 ## How to view balance for particular user_id in SOL and USD
+
 ```bash
 curl -X POST http://127.0.0.1:8080/balance -H "Content-Type: application/json" -d '{"user_id": 2}'
 {"balance":"1.0000000000","balance_usd":"19.59"}
@@ -52,7 +54,7 @@ curl -X POST http://127.0.0.1:8080/balance -H "Content-Type: application/json" -
 ```bash
 curl -X POST http://localhost:8080/goods \
 -H "Content-Type: application/json" \
--d '{"name": "Laptop", "price": 1500, "created_by": 8}'
+-d '{"name": "Book", "price": 1, "created_by": 11}'
 ```
 
 ## How to get product's details
@@ -63,6 +65,7 @@ curl -X POST http://localhost:8080/goods \
 ```
 
 ## How to check whethere user have balance sufficient balance to buy product
+
 ```bash
 curl -X POST http://localhost:8080/can-i-buy \
 -H "Content-Type: application/json" \

@@ -21,9 +21,7 @@ describe("escrow", () => {
   const randomKeypair = anchor.web3.Keypair.generate();
 
   const signer = createKeypairFromFile(
-    require("os").homedir() + "/solana/my-keypair.json"
-    // require("os").homedir() +
-    //   "/src/go/try/sol-pay/solana-squads-escrow/target/deploy/escrow-keypair.json"
+    require("os").homedir() + "/solana/id.json"
   );
 
   const counterpartySigner = anchor.web3.Keypair.generate();
