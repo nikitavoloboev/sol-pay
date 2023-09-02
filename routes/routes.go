@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math/big"
 	"net/http"
 	"os"
 	"strconv"
@@ -30,9 +31,9 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
 
 	e.GET("/", root)
 	e.GET("/hello", hello, middleware.LoggerMiddleware, middleware.SessionMiddleware()) // Add middleware here
+	/* Users */
 	e.POST("/users", h.addUser, middleware.LoggerMiddleware)
 	e.GET("/users/:id", h.showUser, middleware.LoggerMiddleware)
-	e.POST("/pay", h.sendPayment, middleware.LoggerMiddleware)
 	// e.PUT("/users/:id", updateUser)
 	/*Goods*/
 	e.POST("/goods", h.createGood)
@@ -40,6 +41,9 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
 	e.GET("/goods/:id", h.getGoodDetails)
 	e.PUT("/goods/:id", h.updateGood)
 	e.DELETE("/goods/:id", h.deleteGood)
+	/* Payment  */
+	e.POST("/pay", h.sendPayment, middleware.LoggerMiddleware)
+	e.POST("/balance", h.walletBalance, middleware.LoggerMiddleware)
 }
 
 func root(c echo.Context) error {
@@ -57,7 +61,7 @@ func generateWallet() (string, string) {
 	fmt.Println("account public key:", account.PublicKey())
 
 	// Create a new RPC client:
-	client := rpc.New(rpc.DevNet_RPC)
+	client, _ := getRPCSolana()
 
 	// Airdrop 5 SOL to the new account:
 	out, err := client.RequestAirdrop(
@@ -138,6 +142,49 @@ type UserIDInput struct {
 	ExternalWallet *string `json:"external_wallet,omitempty"`
 }
 
+type UserIDAPIInput struct {
+	UserID uint `json:"user_id"`
+}
+
+func (h *Handler) walletBalance(c echo.Context) error {
+	var input UserIDAPIInput
+	if err := c.Bind(&input); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	sourceUser, err := GetUserByID(h.DB, input.UserID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	fmt.Print(sourceUser.Wallet)
+
+	client, _ := getRPCSolana()
+
+	pubKey := solana.MustPublicKeyFromBase58(sourceUser.Wallet) // FIXME prod address
+	out, err := client.GetBalance(
+		context.TODO(),
+		pubKey,
+		rpc.CommitmentFinalized,
+	)
+	if err != nil {
+		panic(err)
+	}
+	spew.Dump(out)
+	spew.Dump(out.Value) // total lamports on the account; 1 sol = 1000000000 lamports
+
+	var lamportsOnAccount = new(big.Float).SetUint64(uint64(out.Value))
+	// Convert lamports to sol:
+	var solBalance = new(big.Float).Quo(lamportsOnAccount, new(big.Float).SetUint64(solana.LAMPORTS_PER_SOL))
+
+	return c.JSON(http.StatusOK, map[string]string{"balance": solBalance.Text('f', 10)})
+
+}
+
+func getRPCSolana() (*rpc.Client, error) {
+	return rpc.New(rpc.DevNet_RPC), nil
+	// return rpc.New(rpc.MainNetBeta_RPC), nil // - this is a REAL ONE :scream:
+}
+
 func (h *Handler) sendPayment(c echo.Context) error {
 	var input UserIDInput
 	if err := c.Bind(&input); err != nil {
@@ -155,7 +202,7 @@ func (h *Handler) sendPayment(c echo.Context) error {
 	}
 
 	// Create a new RPC client:
-	rpcClient := rpc.New(rpc.DevNet_RPC)
+	rpcClient, _ := getRPCSolana()
 
 	// Create a new WS client (used for confirming transactions)
 	wsClient, err := ws.Connect(context.Background(), rpc.DevNet_WS)
@@ -165,7 +212,6 @@ func (h *Handler) sendPayment(c echo.Context) error {
 	}
 
 	// Load the account that you will send funds FROM:
-	// accountFrom, err := solana.PrivateKeyFromSolanaKeygenFile("/path/to/.config/solana/id.json")
 	accountFrom, err := solana.PrivateKeyFromBase58(sourceUser.PrivateKey)
 	if err != nil {
 		panic(err)

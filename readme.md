@@ -33,6 +33,12 @@ curl -X POST http://localhost:8080/pay \
 -d '{"source_user_id": 1, "target_user_id": 2}'
 ```
 
+## How to view balance for particular user_id
+```bash
+curl -X POST http://127.0.0.1:8080/balance -H "Content-Type: application/json" -d '{"user_id": 2}'
+{"balance":"1.0012300000"}
+```
+
 ## How to create goods
 ```bash
 curl -X POST http://localhost:8080/goods \
@@ -48,7 +54,7 @@ curl -X POST http://localhost:8080/goods \
 
 ## How to list/update/delete goods
 ```bash
-curl -X GET http://localhost:8080/goods\?user_id=8
+ curl -X GET http://localhost:8080/goods\?user_id=8
 ```
 
 ## to view db:

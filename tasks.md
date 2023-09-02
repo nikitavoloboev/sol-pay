@@ -36,7 +36,7 @@
   - [x] show which products was created by user => available for sale
   - [x] count how many users bought this product
 - [] endpoint to retrieve products for sale
-- wallet - show balance
+- [x] wallet - show balance
 - allow to receive money from externally (no endpoint)
   - subscription / listen for top up events (subscription to SOL networks)
 - endpoint to allow to send `solana` to external solana address (cash out)
