@@ -232,7 +232,7 @@ func (h *Handler) canIBuyProduct(c echo.Context) error {
 	productId := input.ProductID
 	canIBuyIt := h.checkBalance(productId, input.UserID)
 
-	return c.JSON(http.StatusOK, map[string]bool{"result": canIBuyIt})
+	return c.JSON(http.StatusOK, map[string]bool{"can_pay": canIBuyIt})
 }
 
 func getRPCSolana() (*rpc.Client, error) {

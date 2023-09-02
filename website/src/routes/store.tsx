@@ -196,14 +196,12 @@ export default function store() {
                         body: JSON.stringify(data),
                       })
                       console.log(response, "response")
-                      console.log(await response.text())
-
                       const jsonResponse = await response.json()
-                      console.log(jsonResponse, "json response")
+                      console.log(jsonResponse)
 
                       if (jsonResponse.can_pay) {
-                        const jsonResponse = await response.json()
                         console.log("Can pay:", jsonResponse)
+                        /* DK FIXME - add further logic here */
                       } else {
                         console.log(
                           "Cannot pay",
