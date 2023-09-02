@@ -187,7 +187,7 @@ func (h *Handler) walletBalance(c echo.Context) error {
 	fmt.Print(sourceUser.Wallet)
 	solBalance := getWalletBalance(sourceUser.Wallet)
 	balanceuint32, _ := solBalance.Float32()
-	balanceInUsd := balanceuint32 * currentSolanaPrice()
+	balanceInUsd := balanceuint32 * currentSolanaPriceInUSD()
 	balanceInUsdStr := fmt.Sprintf("%.2f", balanceInUsd)
 
 	return c.JSON(http.StatusOK, map[string]string{
@@ -197,8 +197,12 @@ func (h *Handler) walletBalance(c echo.Context) error {
 
 }
 
-func currentSolanaPrice() float32 {
+func currentSolanaPriceInUSD() float32 {
 	return 19.59
+}
+
+func currentUSDPriceInSOL() float32 {
+	return 3.61
 }
 
 func (h *Handler) checkBalance(productId uint, userId uint) bool {
@@ -213,7 +217,7 @@ func (h *Handler) checkBalance(productId uint, userId uint) bool {
 
 	balance, _ := solBalance.Float32()
 
-	balanceInUsd := balance * currentSolanaPrice()
+	balanceInUsd := balance / currentSolanaPriceInUSD()
 
 	return balanceInUsd >= float32(product.Price)
 
@@ -289,7 +293,8 @@ func (h *Handler) sendPayment(c echo.Context) error {
 	if err != nil {
 		panic(err)
 	}
-	amount := uint64(1)
+	// amount := uint64(1) FIXME NOTE - can be usefull for debug
+	amount := uint64(float32(product.Price) * currentUSDPriceInSOL())
 	tx, err := solana.NewTransaction(
 		[]solana.Instruction{
 			system.NewTransferInstruction(
@@ -336,8 +341,7 @@ func (h *Handler) sendPayment(c echo.Context) error {
 	if err != nil {
 		fmt.Println("Error inserting record:", err)
 	}
-
-	return nil
+	return c.JSON(http.StatusOK, map[string]string{"tix": sig.String()})
 }
 
 /*

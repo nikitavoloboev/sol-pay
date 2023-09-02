@@ -36,6 +36,11 @@ curl -X POST http://localhost:8080/pay \
 -d '{"source_user_id": 1, "target_user_id": 2, "product_id": 300}'
 ```
 
+it will return transaction id:
+```bash
+{"tix":"3kvAHBE25xQ4eYE6BMsnHuYwwszds5Z1f9KcVnwCVWnUfzdm8EDTQetcpdjzhzrUWfd54aF5MFfiMEy65LtWoatt"}
+```
+
 ## How to view balance for particular user_id in SOL and USD
 ```bash
 curl -X POST http://127.0.0.1:8080/balance -H "Content-Type: application/json" -d '{"user_id": 2}'
@@ -47,7 +52,7 @@ curl -X POST http://127.0.0.1:8080/balance -H "Content-Type: application/json" -
 ```bash
 curl -X POST http://localhost:8080/goods \
 -H "Content-Type: application/json" \
--d '{"name": "Laptop", "price": 1500, "user_id": 8}'
+-d '{"name": "Laptop", "price": 1500, "created_by": 8}'
 ```
 
 ## How to get product's details
