@@ -58,3 +58,7 @@
   - `Newsletter`
     - `user` will have access to past paid articles + new ones
   - `Article`: `content: string`
+
+## Deploy into Solana main net
+
+- do demo with real Solana
