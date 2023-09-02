@@ -33,13 +33,13 @@ curl -X GET http://localhost:8080/users/8
 ```bash
 curl -X POST http://localhost:8080/pay \
 -H "Content-Type: application/json" \
--d '{"source_user_id": 1, "target_user_id": 2}'
+-d '{"source_user_id": 1, "target_user_id": 2, "product_id": 300}'
 ```
 
-## How to view balance for particular user_id
+## How to view balance for particular user_id in SOL and USD
 ```bash
 curl -X POST http://127.0.0.1:8080/balance -H "Content-Type: application/json" -d '{"user_id": 2}'
-{"balance":"1.0012300000"}
+{"balance":"1.0000000000","balance_usd":"19.59"}
 ```
 
 ## How to create goods

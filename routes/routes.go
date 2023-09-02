@@ -186,8 +186,14 @@ func (h *Handler) walletBalance(c echo.Context) error {
 	}
 	fmt.Print(sourceUser.Wallet)
 	solBalance := getWalletBalance(sourceUser.Wallet)
+	balanceuint32, _ := solBalance.Float32()
+	balanceInUsd := balanceuint32 * currentSolanaPrice()
+	balanceInUsdStr := fmt.Sprintf("%.2f", balanceInUsd)
 
-	return c.JSON(http.StatusOK, map[string]string{"balance": solBalance.Text('f', 10)})
+	return c.JSON(http.StatusOK, map[string]string{
+		"balance":     solBalance.Text('f', 10),
+		"balance_usd": balanceInUsdStr,
+	})
 
 }
 
@@ -252,7 +258,7 @@ func (h *Handler) sendPayment(c echo.Context) error {
 	//sourceUserBalance := getWalletBalance(sourceUser.Wallet)
 
 	/* do source user have enough balance to cover product cost and transaction fee */
-	if h.checkBalance(productId, input.SourceUserID) == false {
+	if !h.checkBalance(productId, input.SourceUserID) {
 		return echo.NewHTTPError(http.StatusInternalServerError, "not enough balance")
 	}
 
@@ -326,8 +332,10 @@ func (h *Handler) sendPayment(c echo.Context) error {
 	}
 	spew.Dump(sig)
 
-	// FIXME TODO
-	// update BoughtProducts for those who buy
+	err = model.InsertUserGood(h.DB, sourceUser.ID, product.ID)
+	if err != nil {
+		fmt.Println("Error inserting record:", err)
+	}
 
 	return nil
 }

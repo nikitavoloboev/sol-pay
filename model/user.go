@@ -24,6 +24,20 @@ type User struct {
 	BoughtProducts  []Product `json:"bought_products" gorm:"foreignKey:UserID"`
 }
 
+type UserGoodDB struct {
+	ProductID uint `gorm:"primary_key"`
+	UserID    uint `gorm:"primary_key"`
+}
+
+func InsertUserGood(db *gorm.DB, userID, productID uint) error {
+	userGood := UserGoodDB{
+		ProductID: productID,
+		UserID:    userID,
+	}
+
+	return db.Table("user_goods").Create(&userGood).Error
+}
+
 func MigrateDB(db *gorm.DB) {
 	db.AutoMigrate(&User{}, &Product{})
 }
