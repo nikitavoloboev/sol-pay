@@ -195,27 +195,31 @@ func currentSolanaPrice() float32 {
 	return 19.59
 }
 
-func (h *Handler) canIBuyProduct(c echo.Context) error {
-	var input UserIDProductIDAPIInput
-	if err := c.Bind(&input); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
-
-	sourceUser, err := GetUserByID(h.DB, input.UserID)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
+func (h *Handler) checkBalance(productId uint, userId uint) bool {
+	sourceUser, _ := GetUserByID(h.DB, userId)
+	//if err != nil {
+	//	return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	//}
 	fmt.Print(sourceUser.Wallet)
 	solBalance := getWalletBalance(sourceUser.Wallet)
 
-	productId := input.ProductID
 	product, _ := model.GetGoodsByID(h.DB, productId)
 
 	balance, _ := solBalance.Float32()
 
 	balanceInUsd := balance * currentSolanaPrice()
 
-	canIBuyIt := balanceInUsd >= float32(product.Price)
+	return balanceInUsd >= float32(product.Price)
+
+}
+
+func (h *Handler) canIBuyProduct(c echo.Context) error {
+	var input UserIDProductIDAPIInput
+	if err := c.Bind(&input); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	productId := input.ProductID
+	canIBuyIt := h.checkBalance(productId, input.UserID)
 
 	return c.JSON(http.StatusOK, map[string]bool{"result": canIBuyIt})
 }
@@ -240,17 +244,16 @@ func (h *Handler) sendPayment(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	wtf := input.ProductID
-	product, err := model.GetGoodsByID(h.DB, wtf)
+	productId := input.ProductID
+	product, err := model.GetGoodsByID(h.DB, productId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	sourceUserBalance := getWalletBalance(sourceUser.Wallet)
+	//sourceUserBalance := getWalletBalance(sourceUser.Wallet)
 
-	balance, _ := sourceUserBalance.Float32()
-	if float32(product.Price+0.005) < balance {
+	/* do source user have enough balance to cover product cost and transaction fee */
+	if h.checkBalance(productId, input.SourceUserID) == false {
 		return echo.NewHTTPError(http.StatusInternalServerError, "not enough balance")
-
 	}
 
 	// Create a new RPC client:
@@ -270,8 +273,6 @@ func (h *Handler) sendPayment(c echo.Context) error {
 	//fmt.Println("private key:", accountFrom.String())
 	fmt.Println("SOURCE Wallet:", accountFrom.PublicKey().String())
 	fmt.Println("TARGET Wallet:", targetUser.Wallet)
-
-	/* do source user have enough balance to cover product cost and transaction fee */
 
 	/* Good to go - trying to do transaction */
 
