@@ -27,6 +27,7 @@ export default function Store() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 p-2">
         <Card setShowInfoCard={setShowInfoCard} imgSrc="./solana-book.png" />
         <Card setShowInfoCard={setShowInfoCard} imgSrc="./solana-book-2.png" />
+
         {showInfoCard && (
           <div className="fixed top-0 left-0 w-screen h-screen flex items-center justify-end">
             <div
@@ -37,7 +38,7 @@ export default function Store() {
             ></div>
             <div
               id="InfoCard"
-              className=" relative w-[850px] z-20 h-full p-2 gap-2 flex bg-neutral-200"
+              className=" relative w-[850px] z-20 h-full p-2 gap-2 flex bg-[#e5e5e5]"
               style={{ borderRadius: "6px 0 0 6px" }}
             >
               {showInfoCard === "Pricing" && (

@@ -1,31 +1,31 @@
-import { FC } from "react";
-import Link from "next/link";
-import dynamic from "next/dynamic";
-import React, { useState } from "react";
-import { useAutoConnect } from "../contexts/AutoConnectProvider";
-import NetworkSwitcher from "./NetworkSwitcher";
-import NavElement from "./nav-element";
+import { FC } from "react"
+import Link from "next/link"
+import dynamic from "next/dynamic"
+import React, { useState } from "react"
+import { useAutoConnect } from "../contexts/AutoConnectProvider"
+import NetworkSwitcher from "./NetworkSwitcher"
+import NavElement from "./nav-element"
 
 const WalletMultiButtonDynamic = dynamic(
   async () =>
     (await import("@solana/wallet-adapter-react-ui")).WalletMultiButton,
   { ssr: false }
-);
+)
 
 export const AppBar: React.FC = () => {
-  const { autoConnect, setAutoConnect } = useAutoConnect();
-  const [isNavOpen, setIsNavOpen] = useState(false);
+  const { autoConnect, setAutoConnect } = useAutoConnect()
+  const [isNavOpen, setIsNavOpen] = useState(false)
   return (
     <div>
       {/* NavBar / Header */}
-      <div className="navbar flex h-20 flex-row md:mb-2 shadow-lg bg-black text-neutral-content border-b border-zinc-600 bg-opacity-66">
+      <div className="navbar flex h-20 flex-row shadow-lg bg-white text-black border-b border-slate-400 border-opacity-30 bg-opacity-66">
         <div className="navbar-start align-items-center">
           <div className="hidden sm:inline w-22 h-22 md:p-2 ml-10">
-            <div className="bg-[#1b0c36] text-white p-0.5 px-1 gap-2 items-center flex justify-center rounded-[6px] border-slate-500 border border-opacity-50 font-semibold text-opacity-70">
-              <div className="px-[16px] hover:bg-neutral-300 rounded-[6px] p-[8px] font-bold cursor-pointer">
+            <div className="bg-white text-black p-0.5 px-1 gap-2 items-center flex justify-center rounded-[6px] border-slate-500 border border-opacity-50 font-semibold text-opacity-70">
+              <div className="px-[16px] hover:bg-gray-200 rounded-[6px] p-[8px] font-bold cursor-pointer">
                 Products
               </div>
-              <div className="px-[16px] hover:bg-neutral-300 rounded-[6px] p-[8px] cursor-pointer">
+              <div className="px-[16px] hover:bg-gray-200 rounded-[6px] p-[8px] cursor-pointer">
                 Ideas
               </div>
             </div>
@@ -136,5 +136,5 @@ export const AppBar: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
