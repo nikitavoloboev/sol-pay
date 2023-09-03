@@ -2,6 +2,7 @@ import { useState } from "react"
 import Card from "./Card"
 import Pricing from "./Pricing"
 import Info from "./Info"
+import Bought from "./Bought"
 // import { Match, Show, Switch, createSignal } from "solid-js"
 // import Bought from "~/components/Bought"
 // import Card from "~/components/Card"
@@ -47,9 +48,9 @@ export default function Store() {
               {showInfoCard === "Info" && (
                 <Info setShowInfoCard={setShowInfoCard}></Info>
               )}
-              {/* {showInfoCard === "Bought" && (
+              {showInfoCard === "Bought" && (
                 <Bought setShowInfoCard={setShowInfoCard}></Bought>
-              )} */}
+              )}
             </div>
           </div>
         )}
