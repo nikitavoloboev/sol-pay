@@ -1,3 +1,5 @@
+import Star from "./Star"
+
 export default function Pricing(props: any) {
   return (
     <div className="w-full flex">
@@ -12,7 +14,13 @@ export default function Pricing(props: any) {
         <div className="flex flex-col">
           <div className="w-full text-[14px] font-light opacity-90 flex justify-between items-center">
             <div>Software</div>
-            <div>stars</div>
+            <div className="flex gap-1">
+              <Star></Star>
+              <Star></Star>
+              <Star></Star>
+              <Star></Star>
+              <Star></Star>
+            </div>
           </div>
           <div className="flex flex-col gap-2">
             <div className="text-[30px] font-mono">Description</div>

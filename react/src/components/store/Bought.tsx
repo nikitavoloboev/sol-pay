@@ -1,3 +1,5 @@
+import Star from "./Star"
+
 export default function Bought(props: any) {
   return (
     <div className="w-full flex">
@@ -10,10 +12,6 @@ export default function Bought(props: any) {
       <div className="w-[50%] h-full flex flex-col gap-6 items-center py-14 px-6">
         <div className="text-[30px] font-semibold self-start">Title</div>
         <div className="flex flex-col">
-          <div className="w-full text-[14px] font-light opacity-90 flex justify-between items-center">
-            <div>Software</div>
-            <div>stars</div>
-          </div>
           <div className="flex flex-col gap-2">
             <div className="text-[30px] font-mono">Description</div>
             <div className="font-light text-[16px] ">
@@ -30,7 +28,13 @@ export default function Bought(props: any) {
         </div>
         <div className="w-full font-light flex justify-between items-center">
           <div>do you like the product?</div>
-          <div>stars</div>
+          <div className="flex gap-1">
+            <Star></Star>
+            <Star></Star>
+            <Star></Star>
+            <Star></Star>
+            <Star></Star>
+          </div>
         </div>
       </div>
       <div className="w-[50%] gap-8 h-full bg-white rounded-[6px]  flex flex-col px-10 py-12">

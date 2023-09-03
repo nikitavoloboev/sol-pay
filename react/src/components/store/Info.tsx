@@ -1,3 +1,5 @@
+import Star from "./Star"
+
 export default function Info(props: any) {
   return (
     <div className="w-full flex">
@@ -12,7 +14,13 @@ export default function Info(props: any) {
         <div className="w-full gap-2 flex flex-col">
           <div className="w-full text-[14px] font-light opacity-90 flex justify-between items-center">
             <div>Software</div>
-            <div>stars</div>
+            <div className="flex gap-1">
+              <Star></Star>
+              <Star></Star>
+              <Star></Star>
+              <Star></Star>
+              <Star></Star>
+            </div>
           </div>
           <div className="w-full h-[300px] rounded-[6px] border border-slate-400 border-opacity-50"></div>
         </div>
