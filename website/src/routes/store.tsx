@@ -1,10 +1,10 @@
 import { Match, Show, Switch, createSignal } from "solid-js"
-import Bought from "~/components/Bought"
+// import Bought from "~/components/Bought"
 import Card from "~/components/Card"
 import Info from "~/components/Info"
 import Pricing from "~/components/Pricing"
 
-export default function store() {
+export default function Store() {
   // doesnt save if u have bought that course
   const [showInfoCard, setShowInfoCard] = createSignal("")
   return (
@@ -67,7 +67,7 @@ export default function store() {
                   <Info setShowInfoCard={setShowInfoCard}></Info>
                 </Match>
                 <Match when={showInfoCard() === "Bought"}>
-                  <Bought></Bought>
+                  {/* <Bought></Bought> */}
                 </Match>
               </Switch>
             </div>
