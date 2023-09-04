@@ -1,3 +1,7 @@
+Code here will be used in [Learn-Anything.xyz](https://github.com/learn-anything/learn-anything.xyz)
+
+Was done as part of [Solana Hacker House Berlin](https://lu.ma/berlinhh). Slides are [here](https://app.pitch.com/app/player/1afdea18-bfe0-47ee-9cf5-effe93ff66af/876ec223-f35d-44f4-9555-1590ea18ebef/c2e600ac-778b-4d60-88fa-e08f04b4b7da).
+
 ## Run http server
 
 ```

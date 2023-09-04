@@ -24,11 +24,12 @@ import (
 )
 
 type Handler struct {
-	DB *gorm.DB
+	DB           *gorm.DB
+	solanaClient *rpc.Client
 }
 
 func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
-	h := &Handler{DB: db}
+	h := &Handler{DB: db, solanaClient: rpc.New(rpc.DevNet_RPC)}
 
 	e.GET("/", root)
 	e.GET("/hello", hello, middleware.LoggerMiddleware, middleware.SessionMiddleware()) // Add middleware here
@@ -46,6 +47,7 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
 	e.POST("/pay", h.sendPayment, middleware.LoggerMiddleware)
 	e.POST("/balance", h.walletBalance, middleware.LoggerMiddleware)
 	e.POST("/can-i-buy", h.canIBuyProduct, middleware.LoggerMiddleware)
+	e.POST("/usdc-balance", h.getUsdcAccountBalance, middleware.LoggerMiddleware)
 }
 
 func root(c echo.Context) error {
@@ -221,7 +223,21 @@ func (h *Handler) checkBalance(productId uint, userId uint) bool {
 	balanceInUsd := balance * currentSolanaPriceInUSD()
 
 	return balanceInUsd >= float32(product.Price)
+}
 
+func (h *Handler) getUsdcAccountBalance(c echo.Context) error {
+	tokenAddress, _, _ := solana.FindAssociatedTokenAddress(solana.MustPublicKeyFromBase58("3GDCH1RDYFn96ZjPn3QL4BE52t53CmhfqEWUEd3wSTco"), solana.MustPublicKeyFromBase58("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"))
+	fmt.Println(tokenAddress)
+
+	accountBalance, err := h.solanaClient.GetTokenAccountBalance(context.Background(), tokenAddress, rpc.CommitmentFinalized)
+	if err != nil {
+		panic(err)
+	}
+
+	// h.getAccountBalance(c echo.Context)
+
+	// 66.3
+	return c.JSON(http.StatusOK, map[string]string{"usdc_balance": accountBalance.Value.UiAmountString})
 }
 
 func (h *Handler) canIBuyProduct(c echo.Context) error {

@@ -26,8 +26,18 @@ export default function Store() {
       `}
       </style>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 p-2">
-        <Card setShowInfoCard={setShowInfoCard} imgSrc="./solana-book.png" />
-        <Card setShowInfoCard={setShowInfoCard} imgSrc="./solana-book-2.png" />
+        <Card
+          setShowInfoCard={setShowInfoCard}
+          imgSrc="./solana-book.png"
+          name={"Solana in a nutshell"}
+          price="5"
+        />
+        <Card
+          setShowInfoCard={setShowInfoCard}
+          imgSrc="./solana-book-2.png"
+          name={"Solana: speed and scale"}
+          price="3"
+        />
 
         {showInfoCard && (
           <div className="fixed top-0 left-0 w-screen h-screen flex items-center justify-end">
